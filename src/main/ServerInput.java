@@ -2,17 +2,13 @@ package main;
 
 import dragon.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
 
 public class ServerInput extends Thread{
     private DragonCollection dragonCollection;
-    private File file;
 
     public ServerInput(DragonCollection collection) {
         this.dragonCollection = collection;
-        this.file = file;
     }
 
     @Override
