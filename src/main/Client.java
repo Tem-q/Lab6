@@ -2,7 +2,6 @@ package main;
 
 import data.*;
 import dragon.*;
-import reader.*;
 
 import java.io.*;
 import java.net.*;
@@ -117,16 +116,15 @@ public class Client {
                             System.out.println(message.getMessage());
                             break;
                         case "execute_script":
-                            //param = dragonCollection.executeScript(parametrs[1]);
                             if (!parametrs[1].equals("")) {
                                 String scriptName = parametrs[1];
                                 DataForServer<String> executeScript = new DataForServer<>("execute_script", scriptName);
                                 send(executeScript);
+                                message = receive();
+                                System.out.println(message);
                             } else {
                                 System.out.println("You didn't enter a file name");
                             }
-                            message = receive();
-                            System.out.println(message.getMessage());
                             break;
                         case "exit":
                             param = false;

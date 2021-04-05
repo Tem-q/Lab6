@@ -1,5 +1,6 @@
 package dragon;
 
+import data.DataForServer;
 import reader.Reader;
 
 import java.io.BufferedReader;
@@ -8,8 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.InputMismatchException;
-import java.util.Scanner;
 
 /**
  * Class that manages the dragon collection
@@ -63,9 +62,14 @@ public class DragonCollection {
      * @return String message fo client
      */
     public String show() {
-        StringBuilder ss = new StringBuilder();
-        dragons.forEach(v->ss.append(v.toString()).append("\n"));
-        return ss.toString();
+        if (!dragons.isEmpty()) {
+            StringBuilder ss = new StringBuilder();
+            dragons.forEach(v->ss.append(v.toString()).append("\n"));
+            return ss.toString();
+        } else {
+            return ("Collection is empty");
+        }
+
     }
 
     /**
@@ -146,178 +150,91 @@ public class DragonCollection {
 
     /**
      * Method executes the script from the specified file
-     * @param fileName
+     * @param scriptName
      * @return checkExit
      */
-    /*public boolean executeScript(String fileName) {
-        Scanner sc = new Scanner(System.in);
+    public String executeScript(String scriptName) {
+        String message = null;
         BufferedReader bufferedReader = null;
         try {
-            bufferedReader = new BufferedReader(new FileReader(fileName));
+            bufferedReader = new BufferedReader(new FileReader(scriptName));
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
         String line;
-        boolean checkExit = true;
         try {
-            while ((((line = bufferedReader.readLine()) != null)) && (checkExit)) {
+            while (((line = bufferedReader.readLine()) != null)) {
                 String[] parametrs = new String[]{"",""};
                 parametrs = checkTask(line, parametrs);
                 line = parametrs[0];
                 switch (line) {
                     case "help":
-                        help();
+                        message = help();
                         break;
                     case "info":
-                        info();
+                        message = info();
                         break;
                     case "show":
-                        show();
-                        if (collectionSize() == 0) {
-                            System.out.println("Collection is empty");
-                        }
+                        message = show();
                         break;
                     case "add":
-                        add(sc, "add", 0);
-                        break;
-                    case "update":
-                        if (collectionSize() > 0) {
-                            System.out.println("Enter the id to update the element. The id must be int type");
-                            int updateId = 0;
-                            while (true) {
-                                try {
-                                    updateId = sc.nextInt();
-                                    if (checkIdForExistence(updateId)) {
-                                        removeById(updateId);
-                                        add(sc, "update", updateId);
-                                        break;
-                                    } else {
-                                        System.out.println("There is no dragon with this id in the collection");
-                                        sc.nextLine();
-                                        break;
-                                    }
-                                } catch (InputMismatchException e) {
-                                    System.out.println("The id must be int type. Try again");
-                                    sc.nextLine();
-                                }
-                            }
-                        } else {
-                            System.out.println("Collection is empty");
-                        }
+                        message = "";
                         break;
                     case "remove_by_id":
-                        if (collectionSize() > 0) {
-                            System.out.println("Enter the id of dragon. The id must be int type");
-                            int id = 0;
-                            while (true) {
-                                if (sc.hasNextInt()) {
-                                    id = sc.nextInt();
-                                    break;
-                                } else {
-                                    System.out.println("The id must be int type. Try again");
-                                    sc.nextLine();
-                                }
+                        if (!parametrs[1].equals("")) {
+                            try {
+                                int id = Integer.parseInt(parametrs[1]);
+                                message = removeById(id);
+                            } catch (NumberFormatException e) {
+                                message = ("The id must be int type. Change it in a file");
                             }
-                            if (checkIdForExistence(id)) {
-                                removeById(id);
-                            } else {
-                                System.out.println("There is no dragon with this id in the collection");
-                            }
-                            sc.nextLine();
                         } else {
-                            System.out.println("Collection is already empty");
+                            message = ("There is no id in the file");
                         }
                         break;
                     case "clear":
-                        clear();
-                        break;
-                    case "save":
-                        save();
-                        break;
-                    case "execute_script":
-                        try {
-                            executeScript(parametrs[1]);
-                        } catch (NullPointerException e) {
-                            System.out.println("You didn't write a file name in the script");
-                        } catch (StackOverflowError e) {
-                            System.out.println("The script execution went into recursion");
-                        }
-                        break;
-                    case "exit":
-                        checkExit = false;
+                        message = clear();
                         break;
                     case "head":
-                        head();
+                        message = head();
                         break;
                     case "remove_head":
-                        removeHead();
-                        break;
-                    case "add_if_max":
-                        System.out.println("Enter the weight to add the element. The weight must be int type");
-                        int addIfMaxWeight = 0;
-                        while (true) {
-                            try {
-                                addIfMaxWeight = sc.nextInt();
-                                if (checkWeightIfMax(addIfMaxWeight)) {
-                                    add(sc, "add_if_max", addIfMaxWeight);
-                                    break;
-                                } else {
-                                    System.out.println("The weight of this dragon is not the maximum");
-                                    sc.nextLine();
-                                    break;
-                                }
-                            } catch (InputMismatchException e) {
-                                System.out.println("The weight must be int type. Try again");
-                                sc.nextLine();
-                            }
-                        }
+                        message = removeHead();
                         break;
                     case "sum_of_age":
-                        if (collectionSize() > 0) {
-                            sumOfAge();
-                        } else {
-                            System.out.println("Collection is empty");
-                        }
+                        message = sumOfAge();
                         break;
                     case "filter_contains_name":
-                        if (collectionSize() > 0) {
-                            System.out.println("Please enter the name");
-                            String name = sc.nextLine();
-                            filterContainsName(name);
+                        if (!parametrs[1].equals("")) {
+                            String name = parametrs[1];
+                            message = filterContainsName(name);
                         } else {
-                            System.out.println("Collection is empty");
+                            message = ("There is no name in the file");
                         }
                         break;
                     case "filter_less_than_age":
-                        if (collectionSize() > 0) {
-                            System.out.println("Please enter the age. The age must be long type");
-                            long age = 0;
-                            while (true) {
-                                if (sc.hasNextLong()) {
-                                    age = sc.nextLong();
-                                    break;
-                                } else {
-                                    System.out.println("The age must be long type. try again");
-                                    sc.nextLine();
-                                }
+                        if (!parametrs[1].equals("")) {
+                            try {
+                                long age = Long.parseLong(parametrs[1]);
+                                message = filterLessThanAge(age);
+                            } catch (NumberFormatException e) {
+                                message = ("The age must be long type. Change it in a file");
                             }
-                            filterLessThanAge(age);
-                            sc.nextLine();
                         } else {
-                            System.out.println("Collection is empty");
+                            message = ("There is no age in the file");
                         }
                         break;
                     default:
-                        System.out.println("Unknown command. Please try again");
+                        message = "Unknown command. Please change it in a file";
                 }
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            message = "No such file or directory";
         } catch (NullPointerException e) {
-            System.out.println("No such file or directory");
+            message = "No such file or directory";
         }
-        return checkExit;
-    }*/
+        return message;
+    }
 
     /**
      * Method prints the first element of the collection
@@ -435,30 +352,33 @@ public class DragonCollection {
 
 
     /**
-     * Method finds a command from the list in the script
+     * Method finds a command from the list in the input line
      * @param task
      * @return parametrs[]
      */
     public String[] checkTask(String task, String[] parametrs) {
         String[] command = task.split(" ");
         for (int i = 0; i<command.length; i++) {
-            if ((command[i].equals("help")) || (command[i].equals("info")) || (command[i].equals("show")) || (command[i].equals("add")) || (command[i].equals("update")) || (command[i].equals("remove_by_id")) || (command[i].equals("clear")) || (command[i].equals("save")) || (command[i].equals("exit")) || (command[i].equals("head")) || (command[i].equals("remove_head")) || (command[i].equals("add_if_max")) || (command[i].equals("sum_of_age")) || (command[i].equals("filter_contains_name")) || (command[i].equals("filter_less_than_age"))) {
+            if ((command[i].equals("help")) || (command[i].equals("info")) || (command[i].equals("show")) || (command[i].equals("add")) ||
+                    (command[i].equals("clear")) || (command[i].equals("exit")) || (command[i].equals("head")) ||
+                    (command[i].equals("remove_head")) || (command[i].equals("add_if_max")) || (command[i].equals("sum_of_age"))) {
                 parametrs[0] = command[i];
                 break;
             }
             try {
-                if (command[i].equals("execute_script")) {
+                if ((command[i].equals("update")) || (command[i].equals("remove_by_id")) || (command[i].equals("execute_script")) ||
+                        (command[i].equals("filter_contains_name")) || (command[i].equals("filter_less_than_age"))) {
                     parametrs[0] = command[i];
                     parametrs[1] = command[i+1];
                     break;
+                } else {
+                    parametrs[0] = "";
                 }
             } catch (IndexOutOfBoundsException e) {
-                System.out.println("You didn't enter a file name");
-            }
-            if (i==(command.length-1)) {
-                parametrs[0] = "";
-            }
+                parametrs[0] = command[i];
+                parametrs[1] = "";
 
+            }
         }
         return parametrs;
     }

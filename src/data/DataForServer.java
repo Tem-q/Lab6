@@ -1,7 +1,6 @@
 package data;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
 
 public class DataForServer<T> implements Serializable {
     private final String commandName;

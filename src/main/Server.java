@@ -3,18 +3,17 @@ package main;
 import data.*;
 import dragon.*;
 
+
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.util.NoSuchElementException;
 
 public class Server {
     private int port;
     private DatagramSocket socket;
     private InetAddress address;
-    //private static Scanner scanner = new Scanner(System.in);
 
 
     public Server(int port) {
@@ -87,7 +86,9 @@ public class Server {
                         sendMessage(message);
                         break;
                     case "execute_script":
-                        //param = dragonCollection.executeScript(parametrs[1]);
+                        String scriptName = (String) command.getArgument();
+                        message = new DataForClient(dragonCollection.executeScript(scriptName));
+                        sendMessage(message);
                         break;
                     case "head":
                         message = new DataForClient(dragonCollection.head());

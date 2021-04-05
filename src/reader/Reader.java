@@ -20,9 +20,6 @@ public class Reader {
         checkEnvironmentVariable = false;
     }
 
-    public File getFileWay() {
-        return fileWay;
-    }
     /**
      * Method reads a collection from a file
      * @param dragonCollection
